@@ -3,14 +3,6 @@ import subprocess
 import re
 import logging
 
-# set vars
-LIB_LOCATION = '/Users/kkaul/Documents/VSPhotos/dist'
-LIB_CMD = LIB_LOCATION + '/macosx/bin/exiv2'
-FOLDER_LOCATION = '/Users/kkaul/Documents/VSPhotos/src/2013-10'
-
-count = 0
-skipped_files = []
-
 
 def getMetaData(filename):
     try:
@@ -67,9 +59,11 @@ def setDateMetaData(filename, date):
         return False
     cmd = 'set Exif.Photo.DateTimeOriginal ' + str(normalizeDate(date))
     cmd_list = [LIB_CMD, "-M", cmd, filename]
-    logger.debug('Command : {0}'.format(str(cmd_list)))
+    if not demo_mode:
+        logger.debug('Command : {0}'.format(str(cmd_list)))
     try:
-        result = subprocess.check_output(cmd_list)
+        if not demo_mode:
+            result = subprocess.check_output(cmd_list)
         return True
     except Exception as w:
         skipped_files.append(os.path.join(FOLDER_LOCATION, eachFile))
@@ -77,6 +71,20 @@ def setDateMetaData(filename, date):
 
 
 if __name__ == "__main__":
+
+    # set vars
+    LIB_LOCATION = '/Users/kkaul/Documents/VSPhotos/dist'
+    LIB_CMD = LIB_LOCATION + '/macosx/bin/exiv2'
+    FOLDER_LOCATION = '/Users/kkaul/Documents/VSPhotos/src/2013-10'
+
+    count = 0
+    skipped_files = []
+
+    # when True, it will skip metadata write operations on image (useful for dry run and log analysis)
+    # when False, it will run the actual script (exiv2 lib call)
+    demo_mode = True
+
+
     logging.basicConfig(level=logging.DEBUG,
                         filename="log.txt",
                         filemode="a+",
@@ -87,13 +95,15 @@ if __name__ == "__main__":
         logger.debug('Start processing file {0}'.format(eachFile))
         if validFileName(eachFile):
             absolute_filename = os.path.join(FOLDER_LOCATION, eachFile)
-            logger.debug('Absoulte Filename : {0}'.format(absolute_filename))
-
-            logger.info(getMetaData(absolute_filename))
+            if not demo_mode:
+                logger.debug('Absoulte Filename : {0}'.format(absolute_filename))
+            if not demo_mode:
+                logger.info(getMetaData(absolute_filename))
             parsed_date = parseFileNameForDate(eachFile)
             if setDateMetaData(absolute_filename, parsed_date):
                 count += 1
-                logger.info(getMetaData(absolute_filename))
+                if not demo_mode:
+                    logger.info(getMetaData(absolute_filename))
         else:
             skipped_files.append(os.path.join(FOLDER_LOCATION, eachFile))
 
