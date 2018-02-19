@@ -57,7 +57,6 @@ def setDateMetaData(filename, date):
     if filename is None or date is None:
         logger.error('Filename {a} or Date {b} is empty'.format(a=filename, b=date))
         return False
-    # cmd = 'set Exif.Photo.DateTimeOriginal ' + str(normalizeDate(date))
     cmd = '-alldates=' + str(normalizeDate(date))
     cmd_list = [LIB_CMD, cmd, filename]
     if not demo_mode:
@@ -112,8 +111,6 @@ def setTitleMetaData(filename, title):
     if filename is None or title is None:
         logger.error('Filename {a} or Title {b} is empty'.format(a=filename, b=title))
         return False
-    # cmd = 'add Exif.Photo.ImageDescription ' + title
-    # cmd = 'set Exif.Photo.UserComment ' + title
     cmd = '-Title=' + title
     cmd_list = [LIB_CMD, cmd, filename]
     if not demo_mode:
@@ -144,19 +141,17 @@ def setCopyrightMetaData(filename):
 if __name__ == "__main__":
 
     # set vars
-    # LIB_LOCATION = '/Users/kkaul/Documents/VSPhotos/dist'
     LIB_LOCATION = '/usr/local/bin'
-    # LIB_CMD = LIB_LOCATION + '/macosx/bin/exiv2'
     LIB_CMD = LIB_LOCATION + '/exiftool'
 
     FOLDER_ROOT = '/Users/kkaul/Documents/VSPhotos/src/'
-    FOLDER_LOCATION_LIST = ['test'
-                            # '2013-10',
-                            # '2013-11',
-                            # '2013-12',
-                            # '2015-05',
-                            # '2015-06',
-                            # '2015-07'
+    FOLDER_LOCATION_LIST = [
+                            '2013-10',
+                            '2013-11',
+                            '2013-12',
+                            '2015-05',
+                            '2015-06',
+                            '2015-07'
                             ]
 
     global_count = 0
