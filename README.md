@@ -1,8 +1,22 @@
 # VSPhotos
 
-exiv2 is being used to insert metadata into all photos.
+Organize Photos using MetaData manipulation.
+
+
+## Version 2.0
+Previous release version did not have enough capabilities to set lot of Metadata.
+We migrated to using new libs [exiftool](https://www.sno.phy.queensu.ca/~phil/exiftool/)
+
+I'm on macOS so have kept the dmg just in case we need to find the exact version.
+```
+kkaul@kkaul-mac ~/Documents/VSPhotos (master) $ which exiftool
+/usr/local/bin/exiftool
+```
+
+
+## Version 1.0
+[exiv2](http://www.exiv2.org/) is being used to insert metadata into all photos.
 It's open source and has a wide online community for any help
-http://www.exiv2.org/
 
 Have kept the tar just in case we need to find the exact version used
 It unzips to /dist folder

@@ -27,7 +27,7 @@ def parseFileNameForDate(name):
     m = re.match(r'(\d{4}[\d\-]*)-', name)
     if m:
         val = m.group(1)
-        logger.debug('Date >>>{a}<<< is parsed from filename {b}'.format(a=val, b=name))
+        logger.info('Date >>>{a}<<< is parsed from filename {b}'.format(a=val, b=name))
         return m.group(1)    
     else:
         logger.error('Unable to parse date from filename {0}'.format(name))
@@ -57,8 +57,9 @@ def setDateMetaData(filename, date):
     if filename is None or date is None:
         logger.error('Filename {a} or Date {b} is empty'.format(a=filename, b=date))
         return False
-    cmd = 'set Exif.Photo.DateTimeOriginal ' + str(normalizeDate(date))
-    cmd_list = [LIB_CMD, "-M", cmd, filename]
+    # cmd = 'set Exif.Photo.DateTimeOriginal ' + str(normalizeDate(date))
+    cmd = '-alldates=' + str(normalizeDate(date))
+    cmd_list = [LIB_CMD, cmd, filename]
     if not demo_mode:
         logger.debug('Command : {0}'.format(str(cmd_list)))
     try:
@@ -99,11 +100,6 @@ def parseFileNameForTitle(filename):
                 word = ' '.join(re.sub('(?!^)([A-Z][a-z]+)', r' \1', word).split())
                 title_and_description_list[index] = word
 
-        # try:
-        #     title_and_description_list.insert(description_word_index, 'at')
-        # except Exception as e:
-        #     logger.error('Investigate Description in {0} '.format(filename) + str(e))
-
         title_and_description = ' '.join(title_and_description_list)
         logger.info('Title and Description >>>{a}<<< parsed from filename {b}'.format(a=title_and_description, b=filename))
         return title_and_description
@@ -117,8 +113,9 @@ def setTitleMetaData(filename, title):
         logger.error('Filename {a} or Title {b} is empty'.format(a=filename, b=title))
         return False
     # cmd = 'add Exif.Photo.ImageDescription ' + title
-    cmd = 'set Exif.Photo.UserComment ' + title
-    cmd_list = [LIB_CMD, "-M", cmd, filename]
+    # cmd = 'set Exif.Photo.UserComment ' + title
+    cmd = '-Title=' + title
+    cmd_list = [LIB_CMD, cmd, filename]
     if not demo_mode:
         logger.debug('Command : {0}'.format(str(cmd_list)))
     try:
@@ -131,8 +128,9 @@ def setTitleMetaData(filename, title):
 
 
 def setCopyrightMetaData(filename):
-    cmd = 'set Exif.Photo.Copyright' + 'Vedanta Society Sacramento, CA'
-    cmd_list = [LIB_CMD, "-M", cmd, filename]
+    # cmd = 'set Exif.Photo.Copyright' + 'Vedanta Society Sacramento, CA'
+    cmd = '-copyright=' + 'Vedanta Society Sacramento, CA'
+    cmd_list = [LIB_CMD, cmd, filename]
     if not demo_mode:
         logger.debug('Command : {0}'.format(str(cmd_list)))
     try:
@@ -146,8 +144,10 @@ def setCopyrightMetaData(filename):
 if __name__ == "__main__":
 
     # set vars
-    LIB_LOCATION = '/Users/kkaul/Documents/VSPhotos/dist'
-    LIB_CMD = LIB_LOCATION + '/macosx/bin/exiv2'
+    # LIB_LOCATION = '/Users/kkaul/Documents/VSPhotos/dist'
+    LIB_LOCATION = '/usr/local/bin'
+    # LIB_CMD = LIB_LOCATION + '/macosx/bin/exiv2'
+    LIB_CMD = LIB_LOCATION + '/exiftool'
 
     FOLDER_ROOT = '/Users/kkaul/Documents/VSPhotos/src/'
     FOLDER_LOCATION_LIST = ['test'
@@ -168,9 +168,9 @@ if __name__ == "__main__":
     # control flag
     # when True, it will skip metadata write operations on image (useful for dry run and log analysis)
     # when False, it will run the actual script (exiv2 lib call)
-    demo_mode = False
+    demo_mode = True
 
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.INFO,
                         filename="log.txt",
                         filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
