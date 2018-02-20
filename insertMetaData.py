@@ -79,7 +79,7 @@ def setDateMetaData(filename, date):
 def parseFileNameForTitle(filename):
     filename = filename.replace(' ', '-').replace(',','')
     # https://regex101.com/r/rLOK5f/4
-    m1 = re.search(r'([A-Z][a-zA-Z\-\d\.\_\'\(\)]+)\.((jpg)|(pdf))', filename)
+    m1 = re.search(r'([A-Z][a-zA-Z\-\d\.\_\'\(\)]+)\.jpg', filename)
     if m1 and 'IMG_' not in filename:
         title_and_description = m1.group(1)
         title_and_description_list = re.split('-|_', title_and_description)
@@ -163,7 +163,9 @@ if __name__ == "__main__":
                             '2015-03-And-2015-04',
                             '2015-05',
                             '2015-06',
-                            '2015-07'
+                            '2015-07',
+                            'pdf_to_images'
+                            # 'test'
                             ]
 
     global_count = 0
@@ -216,9 +218,6 @@ if __name__ == "__main__":
             # getMetaData after all changes
             if not demo_mode:
                 logger.info(getMetaData(absolute_filename))
-
-            # break
-        # break
 
 logger.info('Total number of files processed : {0}'.format(global_count))
 logger.info('Files processed for date : {0}'.format(date_count))
