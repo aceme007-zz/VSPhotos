@@ -19,16 +19,22 @@ def validFileName(name):
         logger.debug('{0} is a valid filename. Date is present'.format(name))
         return True
     logger.debug('{0} is not a valid filename. Date is absent'.format(name))
-    return False
+    # filenames not adhering to format
+    return True
 
 
 def parseFileNameForDate(name):
-    # extract date
+    # extract date based on filename format
     m = re.match(r'(\d{4}[\d\-]*)-', name)
+    # case where there is some year in filename
+    n = re.search(r'((1|2)\d{3})', name)
     if m:
         val = m.group(1)
         logger.info('Date >>>{a}<<< is parsed from filename {b}'.format(a=val, b=name))
         return m.group(1)    
+    elif n and 'IMG_' not in name:
+        val = n.group(1)
+        logger.info('Date >>>{a}<<< is parsed from filename {b}'.format(a=val, b=name))
     else:
         logger.error('Unable to parse date from filename {0}'.format(name))
         date_skipped_files.append(os.path.join(absolute_filename))
@@ -71,9 +77,10 @@ def setDateMetaData(filename, date):
 
 
 def parseFileNameForTitle(filename):
-    # https://regex101.com/r/rLOK5f/2
-    m1 = re.search(r'([A-Z][a-zA-Z\-\d\.\_]+)\.jpg', filename)
-    if m1:
+    filename = filename.replace(' ', '-').replace(',','')
+    # https://regex101.com/r/rLOK5f/4
+    m1 = re.search(r'([A-Z][a-zA-Z\-\d\.\_\'\(\)]+)\.((jpg)|(pdf))', filename)
+    if m1 and 'IMG_' not in filename:
         title_and_description = m1.group(1)
         title_and_description_list = re.split('-|_', title_and_description)
         for (index, word) in enumerate(title_and_description_list):
@@ -84,11 +91,12 @@ def parseFileNameForTitle(filename):
                 # ['Sw', 'Bhashya', 'Sw', 'Shraddha', 'Sw', 'Asesha']
                 expanded_list = re.sub('(?!^)([A-Z][a-z]+)', r' \1', word).split()
                 for (i, item) in enumerate(expanded_list):
-                    if item == 'Sw':
+                    if item == 'Sw' or item == 'Sw.':
                         expanded_list[i] = 'Swami'
-                    else:
-                        if expanded_list[i-1] == 'Swami':
-                            expanded_list[i] = item + 'nanda'
+                    elif expanded_list[i-1] == 'Swami':
+                            if 'nanda' not in item:
+                                expanded_list[i] = item + 'nanda'
+
                 expanded = ' '.join(expanded_list)
                 title_and_description_list[index] = expanded
             elif 'album' in word.lower() or 'abum' in word.lower():
@@ -149,6 +157,10 @@ if __name__ == "__main__":
                             '2013-10',
                             '2013-11',
                             '2013-12',
+                            '2014-01-And-2014-02',
+                            '2014-03-To-2014-12',
+                            '2015-01-And-2015-02',
+                            '2015-03-And-2015-04',
                             '2015-05',
                             '2015-06',
                             '2015-07'
@@ -205,8 +217,8 @@ if __name__ == "__main__":
             if not demo_mode:
                 logger.info(getMetaData(absolute_filename))
 
-            break
-        break
+            # break
+        # break
 
 logger.info('Total number of files processed : {0}'.format(global_count))
 logger.info('Files processed for date : {0}'.format(date_count))
