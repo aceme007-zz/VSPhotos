@@ -77,25 +77,35 @@ def setDateMetaData(filename, date):
 
 
 def parseFileNameForTitle(filename):
-    filename = filename.replace(' ', '-').replace(',','')
+    filename = filename.replace(' ', '').replace(',','')
     # https://regex101.com/r/rLOK5f/4
     m1 = re.search(r'([A-Z][a-zA-Z\-\d\.\_\'\(\)]+)\.jpg', filename)
     if m1 and 'IMG_' not in filename:
         title_and_description = m1.group(1)
-        title_and_description_list = re.split('-|_', title_and_description)
+        title_and_description_list = re.split('-|_|\(|\)', title_and_description)
         for (index, word) in enumerate(title_and_description_list):
             if word == 'Sac':
                 title_and_description_list[index] = 'Sacramento'
             elif 'Sw' in word:
-                # split word into own list
+                # split camel case word into own list
                 # ['Sw', 'Bhashya', 'Sw', 'Shraddha', 'Sw', 'Asesha']
                 expanded_list = re.sub('(?!^)([A-Z][a-z]+)', r' \1', word).split()
+
+                skip_verbs = ['giving', 'with', 'sitting', 'seated', 'of', 'playing', 'speaking', 'after', 'singing',
+                              'ringing', 'at', 'doing', 'distributing', 'on', 'testing']
                 for (i, item) in enumerate(expanded_list):
                     if item == 'Sw' or item == 'Sw.':
                         expanded_list[i] = 'Swami'
-                    elif expanded_list[i-1] == 'Swami':
-                            if 'nanda' not in item:
-                                expanded_list[i] = item + 'nanda'
+                    elif i != 0 and expanded_list[i-1] == 'Swami':
+                        if 'nanda' not in item and item.lower() not in skip_verbs:
+                            # handle case where name has number in end
+                            if str(item)[-1].isdigit():
+                                item = item[:-2]
+                            expanded_list[i] = item + 'nanda'
+                    # TODO taking too much time; maybe find a better solution for this case
+                    # elif 'nanda' in item:
+                    #     if expanded_list[i-1] != 'Swami':
+                    #         expanded_list.insert(i-1, 'Swami')
 
                 expanded = ' '.join(expanded_list)
                 title_and_description_list[index] = expanded
@@ -191,9 +201,7 @@ if __name__ == "__main__":
         for eachFile in os.listdir(folder_location):
             global_count += 1
             absolute_filename = os.path.join(folder_location, eachFile)
-            if not demo_mode:
-                logger.debug('Absoulte Filename : {0}'.format(absolute_filename))
-            logger.debug('Start processing file {0}'.format(eachFile))
+            logger.info('Start processing file Filename : {0}'.format(absolute_filename))
 
             # getMetaData before making any changes
             if not demo_mode:
