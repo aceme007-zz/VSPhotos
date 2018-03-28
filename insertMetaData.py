@@ -52,7 +52,7 @@ def normalizeDate(date):
         val = m2.group(1) + ':' + m2.group(2).zfill(2) + ':01 09:00:00'
         logger.debug('Normalized date {0}'.format(val))
         return val
-    m3 = re.match(r'(\d{4})\-', date)
+    m3 = re.match(r'(\d{4})\-?', date)
     if m3:
         val = m3.group(1) + ':01:01 09:00:00'
         logger.debug('Normalized date {0}'.format(val))
@@ -64,7 +64,7 @@ def setDateMetaData(filename, date):
         logger.error('Filename {a} or Date {b} is empty'.format(a=filename, b=date))
         return False
     cmd = '-alldates=' + str(normalizeDate(date))
-    cmd_list = [LIB_CMD, cmd, filename]
+    cmd_list = [LIB_CMD, cmd, OVERWRITE_FILE, filename]
     if not demo_mode:
         logger.debug('Command : {0}'.format(str(cmd_list)))
     try:
@@ -130,7 +130,7 @@ def setTitleMetaData(filename, title):
         logger.error('Filename {a} or Title {b} is empty'.format(a=filename, b=title))
         return False
     cmd = '-Title=' + title
-    cmd_list = [LIB_CMD, cmd, filename]
+    cmd_list = [LIB_CMD, cmd, OVERWRITE_FILE, filename]
     if not demo_mode:
         logger.debug('Command : {0}'.format(str(cmd_list)))
     try:
@@ -145,7 +145,7 @@ def setTitleMetaData(filename, title):
 def setCopyrightMetaData(filename):
     # cmd = 'set Exif.Photo.Copyright' + 'Vedanta Society Sacramento, CA'
     cmd = '-copyright=' + 'Vedanta Society Sacramento, CA'
-    cmd_list = [LIB_CMD, cmd, filename]
+    cmd_list = [LIB_CMD, cmd, OVERWRITE_FILE, filename]
     if not demo_mode:
         logger.debug('Command : {0}'.format(str(cmd_list)))
     try:
@@ -161,21 +161,23 @@ if __name__ == "__main__":
     # set vars
     LIB_LOCATION = '/usr/local/bin'
     LIB_CMD = LIB_LOCATION + '/exiftool'
+    OVERWRITE_FILE = '-overwrite_original'
 
     FOLDER_ROOT = '/Users/kkaul/Documents/VSPhotos/src/'
     FOLDER_LOCATION_LIST = [
-                            '2013-10',
-                            '2013-11',
-                            '2013-12',
-                            '2014-01-And-2014-02',
-                            '2014-03-To-2014-12',
-                            '2015-01-And-2015-02',
-                            '2015-03-And-2015-04',
-                            '2015-05',
-                            '2015-06',
-                            '2015-07',
-                            'pdf_to_images'
-                            # 'test'
+                            # '2013-09',
+                            # '2013-10',
+                            # '2013-11',
+                            # '2013-12',
+                            # '2014-01-And-2014-02',
+                            # '2014-03-To-2014-12',
+                            # '2015-01-And-2015-02',
+                            # '2015-03-And-2015-04',
+                            # '2015-05',
+                            # '2015-06',
+                            # '2015-07',
+                            # 'pdf_to_images'
+                            'test'
                             ]
 
     global_count = 0
@@ -187,7 +189,7 @@ if __name__ == "__main__":
     # control flag
     # when True, it will skip metadata write operations on image (useful for dry run and log analysis)
     # when False, it will run the actual script (exiv2 lib call)
-    demo_mode = True
+    demo_mode = False
 
     logging.basicConfig(level=logging.INFO,
                         filename="log.txt",
@@ -199,6 +201,7 @@ if __name__ == "__main__":
         folder_location = FOLDER_ROOT + folder_location
         logger.debug('\nStart processing folder {0}'.format(folder_location))
         for eachFile in os.listdir(folder_location):
+
             global_count += 1
             absolute_filename = os.path.join(folder_location, eachFile)
             logger.info('Start processing file Filename : {0}'.format(absolute_filename))
